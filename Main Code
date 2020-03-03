@@ -1,0 +1,199 @@
+#include <LiquidCrystal.h>
+#define lenght 16.0
+
+// Definícia premenných
+
+unsigned char b;
+unsigned int Peace;
+
+const int RS = 8;
+const int EN = 9;
+const int d4 = 4;
+const int d5 = 5;
+const int d6 = 6;
+const int d7 = 7;
+const int pin_BL = 10; 
+
+const int Pot_Trust = A1;
+
+int Pot_Per;
+int Pot_Current;
+
+LiquidCrystal lcd( RS,  EN,  d4,  d5,  d6,  d7);
+
+
+byte p1[8] = {
+  0x10,
+  0x10,
+  0x10,
+  0x10,
+  0x10,
+  0x10,
+  0x10,
+  0x10
+  };
+
+byte p2[8] = {
+  0x18,
+  0x18,
+  0x18,
+  0x18,
+  0x18,
+  0x18,
+  0x18,
+  0x18
+  };
+
+byte p3[8] = {
+  0x1C,
+  0x1C,
+  0x1C,
+  0x1C,
+  0x1C,
+  0x1C,
+  0x1C,
+  0x1C};
+
+byte p4[8] = {
+  0x1E,
+  0x1E,
+  0x1E,
+  0x1E,
+  0x1E,
+  0x1E,
+  0x1E,
+  0x1E
+  };
+
+byte p5[8] = {
+  0x1F,
+  0x1F,
+  0x1F,
+  0x1F,
+  0x1F,
+  0x1F,
+  0x1F,
+  0x1F
+  };
+
+void setup() 
+{
+  
+ lcd.begin(16, 2);
+ lcd.clear();
+ pinMode(Pot_Trust, INPUT);
+
+ delay(100);
+ 
+ lcd.createChar(0, p1);
+ lcd.createChar(1, p2);
+ lcd.createChar(2, p3);
+ lcd.createChar(3, p4);
+ lcd.createChar(4, p5);
+
+}
+
+void loop() 
+{
+  
+ char Min[] = "MIN";
+ char Idle[] = "IDLE";
+ char Mil[] = "MIL";
+ char Max[] = "MAX";
+  
+ lcd.setCursor(0, 0);
+ 
+ Pot_Current = analogRead(Pot_Trust);
+ Pot_Per = map(Pot_Current, 0, 1023, 0, 100);
+
+ //Percentuálne vypisovanie hodnôt
+ lcd.print("Trust:");
+ lcd.print(Pot_Per);
+ lcd.print("%");
+ lcd.print("  ");
+ 
+ if(Pot_Per >= 0 && Pot_Per <= 20)
+  lcd.print(Min);
+
+ if(Pot_Per >= 21 && Pot_Per <= 50)
+  lcd.print(Idle);
+
+if(Pot_Per >= 51 && Pot_Per <= 80)
+  lcd.print(Mil);
+
+if(Pot_Per >= 81 && Pot_Per <= 100)
+  lcd.print(Max);  
+    
+ delay(100);
+ lcd.print("   ");
+ delay(100);
+
+ lcd.setCursor(0, 1);
+
+//Vykreslovanie baru
+
+ int Value = analogRead(Pot_Trust);
+
+ int Percent = map(Value, 0, 1023, 0, 100);
+
+ double a = lenght/100*Percent;
+
+ // Kreslenie obldnížkov
+
+ if (a >= 1) 
+ {
+
+   for (int i = 1; i < a; i++) 
+   {
+
+     lcd.write(4);
+
+     b = i;
+   }
+
+   a = a - b;
+
+ }
+
+ Peace = a * 5;
+
+// Vykreslovanie riadkov
+
+ switch (Peace) 
+ {
+
+ case 0:
+
+   break;
+
+ case 1:
+    lcd.write((byte)0);
+   break;
+
+ case 2:
+    lcd.write((byte)1);
+   break;
+
+ case 3:
+    lcd.write((byte)2);
+   break;
+
+ case 4:
+    lcd.write((byte)3);
+   break;
+
+ }
+
+//Čistenie riadku
+ for (int i = 0; i < (lenght - b); i++) 
+ {
+
+   lcd.print(" ");
+ }
+
+ ;
+
+ if(Percent < 1)
+   lcd.clear();
+ 
+}
